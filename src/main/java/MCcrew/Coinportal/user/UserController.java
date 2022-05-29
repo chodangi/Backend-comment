@@ -10,6 +10,7 @@ import MCcrew.Coinportal.login.JwtService;
 import MCcrew.Coinportal.util.BasicResponse;
 import MCcrew.Coinportal.util.CommonResponse;
 import MCcrew.Coinportal.util.ErrorResponse;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -100,6 +101,18 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse("허가되지 않은 사용자입니다."));
         }
         Long userId = jwtService.getUserIdByJwt(jwt);
+        if(userId == 0L){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse("허가되지 않은 사용자입니다."));
+        }else{
+            User user =  userService.getUserById(userId);
+            return ResponseEntity.ok().body(new CommonResponse(user));
+        }
+    }
+
+    @ApiOperation(value = "userId로 정보 조회")
+    @GetMapping("/user")
+    public ResponseEntity<? extends BasicResponse> getUserInfoController(Long userId) {
+        logger.info("getUserInfoController(): 내 설정값 반환");
         if(userId == 0L){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse("허가되지 않은 사용자입니다."));
         }else{
