@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 @Service
@@ -39,6 +40,14 @@ public class CoinTemperService {
         coinList.add(coinTemperETH.doubleValue());
         coinList.add(coinTemperXRP.doubleValue());
         return coinList;
+    }
+
+    public HashMap<String,Double> getCoinTempers() throws Exception {
+        HashMap<String,Double> temperList = new HashMap<>();
+        temperList.put("BTC", coinTemperBTC.doubleValue());
+        temperList.put("ETH", coinTemperETH.doubleValue());
+        temperList.put("XRP", coinTemperXRP.doubleValue());
+        return temperList;
     }
 
     /**

@@ -45,7 +45,8 @@ public class CoinTemperController {
     public ResponseEntity<? extends BasicResponse> coinTemperController(){
         logger.info("coinTemperController(): 현재 코인 체감 온도 반환");
         try {
-            List<Double> result = coinTemperService.getCoinTemper();
+            //List<Double> result = coinTemperService.getCoinTemper();
+            HashMap<String,Double> result = coinTemperService.getCoinTempers();
             return ResponseEntity.ok().body(new CommonResponse(result));
         }catch(Exception e){
             return ResponseEntity.internalServerError().build();
