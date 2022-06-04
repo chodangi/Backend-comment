@@ -16,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.persistence.Basic;
+import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -169,9 +170,20 @@ public class BoardController {
        선택한 게시글 신고
     */
     @PostMapping("/post/report")
-    public ResponseEntity<? extends BasicResponse> reportController(@RequestParam("postId") Long postId){
+    public ResponseEntity<? extends BasicResponse> reportController(HttpServletRequest request, @RequestHeader String jwt, @RequestParam("postId") Long postId){
         logger.info("reportController(): " +postId + "번 게시글을 신고합니다.");
         try{
+            String remoteAddr = "";
+            if(request != null) {
+                remoteAddr = request.getHeader("X-FORWARDED-FOR");
+                if(remoteAddr == null || "".equals(remoteAddr)) {
+                    remoteAddr = request.getRemoteAddr();
+                }
+            }
+            Long userId = jwtService.getUserIdByJwt(jwt);
+            // 관리자일 경우 바로 삭제
+            if(userId==1) boardService.status2Block(postId);
+
             int reportCnt = boardService.reportPost(postId);
             return ResponseEntity.ok().body(new CommonResponse(reportCnt));
         }catch(Exception e){

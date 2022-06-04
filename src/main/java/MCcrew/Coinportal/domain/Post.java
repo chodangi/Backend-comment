@@ -17,6 +17,7 @@ public class Post {            // 게시글
     @Id @GeneratedValue
     private Long id;            // 디비생성 pk
     private Long userId;        // 게시글 작성자 id
+    private int userPoint;
 
     @OneToMany(mappedBy = "post", orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JsonManagedReference
@@ -48,9 +49,10 @@ public class Post {            // 게시글
     private List<Attachment> attachedFiles = new ArrayList<>();
 
     @Builder
-    public Post(Long id, Long userId, List<Comment> comments, String userNickname, String boardName, String guestName, String guestPwd, String content, int upCnt, int downCnt, int viewCnt, int reportCnt, Date createdAt, Date updatedAt, char status, List<Attachment> attachedFiles) {
+    public Post(Long id, Long userId, int userPoint, List<Comment> comments, String userNickname, String boardName, String guestName, String guestPwd, String content, int upCnt, int downCnt, int viewCnt, int reportCnt, Date createdAt, Date updatedAt, char status, List<Attachment> attachedFiles) {
         this.id = id;
         this.userId = userId;
+        this.userPoint = userPoint;
         this.comments = comments;
         this.userNickname = userNickname;
         this.boardName = boardName;

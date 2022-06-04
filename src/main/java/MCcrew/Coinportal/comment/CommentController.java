@@ -15,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -78,8 +79,21 @@ public class CommentController {
         댓글 신고
      */
     @PostMapping("/report/{commentId}")
-    public ResponseEntity<? extends BasicResponse> report2Controller(@PathVariable Long commentId) {
-        int result = commentService.reportComment(commentId);
+    public ResponseEntity<? extends BasicResponse> report2Controller(@PathVariable Long commentId, @RequestHeader String jwt, HttpServletRequest request) {
+        logger.info("report2Controller(): "+ commentId + "번 댓글을 신고신고신고합니다.");
+        String remoteAddr = "";
+        if(request != null) {
+            remoteAddr = request.getHeader("X-FORWARDED-FOR");
+            if (remoteAddr == null || "".equals(remoteAddr)) {
+                remoteAddr = request.getRemoteAddr();
+            }
+        }
+        Long userId = jwtService.getUserIdByJwt(jwt);
+        // 관리자일 경우 바로 삭제
+        if(userId==1) commentService.status2Block(commentId);
+        //HashMap<String,Object> result = commentService.reportComment(commentId);
+        boolean result = commentService.reportComment2(commentId, userId, remoteAddr);
+        System.out.println("==========================================================");
         return ResponseEntity.ok(new CommonResponse(result));
     }
 }

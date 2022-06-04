@@ -1,10 +1,8 @@
 package MCcrew.Coinportal.board;
 
-import MCcrew.Coinportal.domain.Attachment;
+import MCcrew.Coinportal.domain.*;
 import MCcrew.Coinportal.domain.Dto.PostDto;
 import MCcrew.Coinportal.admin.AdminRepository;
-import MCcrew.Coinportal.domain.Notice;
-import MCcrew.Coinportal.domain.Post;
 import MCcrew.Coinportal.photo.AttachmentRepository;
 import MCcrew.Coinportal.photo.AttachmentService;
 import MCcrew.Coinportal.user.UserRepository;
@@ -109,6 +107,7 @@ public class BoardService {
         Date date = new Date();
         Post newPost = new Post();
         newPost.setUserId(userPostDto.getUserId());
+        newPost.setUserPoint(userPostDto.getUserPoint());
         newPost.setUserNickname(userPostDto.getNickname());
         newPost.setBoardName(userPostDto.getBoardName());
         newPost.setGuestName(userPostDto.getGuestName());
@@ -166,9 +165,41 @@ public class BoardService {
      */
     public int reportPost(Long postId) throws Exception{
         Post findPost = boardRepository.findById(postId);
+        // 신고 3회 누적시 삭제
+        if(findPost.getReportCnt()>=2) status2Block(postId);
         findPost.setReportCnt(findPost.getReportCnt() + 1);
         return findPost.getReportCnt();
     }
+
+    /**
+     선택한 게시글 신고
+     */
+    public boolean reportPost2(Long postId, Long userId, String ip) throws Exception{
+        Post findPost = boardRepository.findById(postId);
+        User findUser = userRepository.findById(userId);
+        // 이력이 있다면 또 신고 불가
+        if (boardRepository.findReportByIdOrIp(findPost, findUser, ip) > 0) {
+            return false;
+        }
+
+        // 이력이 없다면 report 테이블에 레코드 추가
+        Report report = Report.builder()
+                .post(findPost)
+                .user(findUser)
+                .ip(ip)
+                .build();
+        boardRepository.save(report);
+
+        // 신고 3회 누적시 삭제
+        if (findPost.getReportCnt()>=2) {
+            findPost.setStatus('D');
+        } else {
+            findPost.setReportCnt(findPost.getReportCnt() + 1);
+        }
+        boardRepository.save(findPost);
+        return true;
+    }
+
 
     /**
         선택한 게시글 조회수 증가
@@ -242,7 +273,7 @@ public class BoardService {
     }
 
     /**
-        삭제 상태로 변경 - deprecated
+        삭제 상태로 변경
      */
     public boolean status2Delete(Long postId, Long userId) {
         Post findPost = boardRepository.findById(postId);
@@ -253,6 +284,16 @@ public class BoardService {
             boardRepository.save(findPost);
             return true;
         }
+    }
+
+    /**
+     신고 후 삭제 상태로 변경
+     */
+    public boolean status2Block(Long postId) {
+        Post findPost = boardRepository.findById(postId);
+        findPost.setStatus('D');
+        boardRepository.save(findPost);
+        return true;
     }
 
     private static final int BLOCK_PAGE_NUM_COUNT = 5; // 블럭에 존재하는 페이지 번호 수
@@ -329,6 +370,7 @@ public class BoardService {
 
         Post post = new Post();
         post.setUserId(userIdx);
+        post.setUserPoint(postDto.getUserPoint());
         post.setComments(new ArrayList<>());
         post.setUserNickname(postDto.getNickname());
         post.setBoardName(postDto.getBoardName());

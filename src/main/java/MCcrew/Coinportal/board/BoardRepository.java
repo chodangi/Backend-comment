@@ -1,7 +1,6 @@
 package MCcrew.Coinportal.board;
 
-import MCcrew.Coinportal.domain.Attachment;
-import MCcrew.Coinportal.domain.Post;
+import MCcrew.Coinportal.domain.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -114,5 +113,25 @@ public class BoardRepository{
             return 0;
         }
         return deleted; // return number of deleted column
+    }
+
+    /**
+     * 신고 이력 조회
+     */
+    public Long findReportByIdOrIp(Post post, User user, String ip) {
+        String sql = "select count(r) from Report r where r.post=:post and (r.user=:user or r.ip=:ip)";
+        return (Long) em.createQuery(sql)
+                .setParameter("post", post)
+                .setParameter("user", user)
+                .setParameter("ip", ip)
+                .getSingleResult();
+    }
+
+    /**
+     * 신고 이력 저장
+     */
+    public Report save(Report report) {
+        em.persist(report);
+        return report;
     }
 }

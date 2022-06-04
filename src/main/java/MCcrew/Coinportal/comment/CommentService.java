@@ -5,19 +5,15 @@ import MCcrew.Coinportal.board.BoardRepository;
 import MCcrew.Coinportal.domain.Comment;
 import MCcrew.Coinportal.domain.Dto.PostCommentDto;
 import MCcrew.Coinportal.domain.Post;
+import MCcrew.Coinportal.domain.Report;
 import MCcrew.Coinportal.domain.User;
 import MCcrew.Coinportal.login.JwtService;
 import MCcrew.Coinportal.user.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.UnsupportedEncodingException;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Service
 public class CommentService {
@@ -132,12 +128,59 @@ public class CommentService {
     /**
         댓글 신고
      */
-    public int reportComment(Long commentId) {
+    public HashMap<String, Object> reportComment(Long commentId) {
         Comment findComment = commentRepository.findById(commentId);
         System.out.println("getReport: "+findComment.getReportCnt());
-        findComment.setReportCnt(findComment.getReportCnt() + 1);
+
+        // 회원 및 아이피 당 신고 1번으로 제한
+
+
+        // 신고 3번 누적 시 댓글 가림
+        if (findComment.getReportCnt() >= 2) {
+            findComment.setStatus('D');
+        } else {
+            findComment.setReportCnt(findComment.getReportCnt() + 1);
+        }
         commentRepository.save(findComment);
-        return findComment.getReportCnt();
+
+        HashMap<String,Object> map = new HashMap<>();
+        map.put("reportCnt", findComment.getReportCnt());
+        map.put("status", findComment.getStatus());
+        return map;
+    }
+
+    public boolean reportComment2(Long commentId, Long userId, String ip) {
+        // 해당 comment를 신고한 이력이 있는지 user 혹은 ip로 체크
+        Comment findComment = commentRepository.findById(commentId);
+        User findUser = userRepository.findById(userId);
+        // 이력이 있다면 또 신고 불가
+        if (commentRepository.findReportByIdOrIp(findComment, findUser, ip) > 0) {
+            return false;
+        }
+
+        // 이력이 없다면 report 테이블에 레코드 추가
+        Report report = Report.builder()
+                .comment(findComment)
+                .user(findUser)
+                .ip(ip)
+                .build();
+        commentRepository.save(report);
+
+        // reportCnt+1, 신고 3번 누적 시 댓글 가림
+        if (findComment.getReportCnt() >= 2) {
+            findComment.setStatus('D');
+        } else {
+            findComment.setReportCnt(findComment.getReportCnt() + 1);
+        }
+        commentRepository.save(findComment);
+        return true;
+    }
+
+    public boolean status2Block(Long commentId) {
+        Comment findComment = commentRepository.findById(commentId);
+        findComment.setStatus('D');
+        commentRepository.save(findComment);
+        return true;
     }
 
     /**

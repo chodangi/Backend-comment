@@ -2,6 +2,8 @@ package MCcrew.Coinportal.comment;
 
 import MCcrew.Coinportal.domain.Comment;
 import MCcrew.Coinportal.domain.Post;
+import MCcrew.Coinportal.domain.Report;
+import MCcrew.Coinportal.domain.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -66,5 +68,25 @@ public class CommentRepository {
         String sql = "select max(c.commentGroup) from Comment c";
         Query query = em.createQuery(sql);
         return query.setMaxResults(1).getResultList();
+    }
+
+    /**
+     * 신고 이력 조회
+     */
+    public Long findReportByIdOrIp(Comment comment, User user, String ip) {
+        String sql = "select count(r) from Report r where r.comment=:comment and (r.user=:user or r.ip=:ip)";
+        return (Long) em.createQuery(sql)
+                .setParameter("comment", comment)
+                .setParameter("user", user)
+                .setParameter("ip", ip)
+                .getSingleResult();
+    }
+
+    /**
+     * 신고 이력 저장
+     */
+    public Report save(Report report) {
+        em.persist(report);
+        return report;
     }
 }
