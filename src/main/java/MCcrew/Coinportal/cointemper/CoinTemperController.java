@@ -100,8 +100,7 @@ public class CoinTemperController {
         symbol = BTC or ETH or XRP
      */
     @ApiOperation(value = "코인 종류별 체감온도 댓글 post",
-            notes = "PathVariable로는 BTC, ETH, XRP 세가지 값 중 하나를 사용한다. 각각 비트코인, 이더리움, 리플을 뜻함. " +
-                    "예를 들어 비트코인 사용자가 체감온도에 댓글을 달면 /temper/comment/BTC 이렇게 사용하면 된다.")
+            notes = "BTC(비트코인) ETH(이더리움) XRP(리플) ADA(에이다) SOL(솔라나) DOG(도지코인) DOT(폴카닷) TRX(트론) DAI(다이) AVX(아발란체) WMX(위믹스) REP(어거) ETC(이더리움 클래식) BTG(비트코인 골드)")
     @PostMapping("/comment/{symbol}")
     public ResponseEntity<? extends BasicResponse> commentController(@PathVariable String symbol, @RequestBody PostCoinCommentDto commentDto, @RequestHeader String jwt){
         logger.info("createCommentController(): " + symbol + "에 댓글을 작성합니다.");
@@ -124,7 +123,8 @@ public class CoinTemperController {
         코인 체감 온도 댓글 반환
         symbol = BTC or ETH or XRP
      */
-    @ApiOperation(value = "코인 종류별 체감온도 댓글 get", notes = "PathVariable로는 BTC, ETH, XRP 세가지 값 중 하나를 사용한다.")
+    @ApiOperation(value = "코인 종류별 체감온도 댓글 get",
+            notes = "BTC(비트코인) ETH(이더리움) XRP(리플) ADA(에이다) SOL(솔라나) DOG(도지코인) DOT(폴카닷) TRX(트론) DAI(다이) AVX(아발란체) WMX(위믹스) REP(어거) ETC(이더리움 클래식) BTG(비트코인 골드)")
     @GetMapping("/comments/{symbol}")
     public ResponseEntity<? extends BasicResponse> getCommentController(@PathVariable String symbol){
         logger.info("getCommentController(): " + symbol + "의 댓글을 반환합니다. ");
