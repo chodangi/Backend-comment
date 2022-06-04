@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -36,10 +37,12 @@ public class Post {            // 게시글
     private int downCnt;      // 싫어요 개수
     private int viewCnt;      // 조회수
     private int reportCnt;    // 신고수
-    @Temporal(TemporalType.TIMESTAMP)
+    /*@Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;    // 생성 날짜
     @Temporal(TemporalType.TIMESTAMP)
-    private Date updatedAt;    // 수정 날짜
+    private Date updatedAt;    // 수정 날짜*/
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
     // A:active, D:deleted, R:reported
     @Column(length = 2)
     private char status;       // 상태
@@ -48,8 +51,20 @@ public class Post {            // 게시글
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
     private List<Attachment> attachedFiles = new ArrayList<>();
 
+    @PrePersist
+    public void createdAt() {
+        this.createdAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    public void updatedAt() {
+        this.updatedAt = LocalDateTime.now();
+    }
+
     @Builder
-    public Post(Long id, Long userId, int userPoint, List<Comment> comments, String userNickname, String boardName, String guestName, String guestPwd, String content, int upCnt, int downCnt, int viewCnt, int reportCnt, Date createdAt, Date updatedAt, char status, List<Attachment> attachedFiles) {
+    public Post(Long id, Long userId, int userPoint, List<Comment> comments, String userNickname, String boardName,
+                String guestName, String guestPwd, String content, int upCnt, int downCnt, int viewCnt, int reportCnt,
+                LocalDateTime createdAt, LocalDateTime updatedAt, char status, List<Attachment> attachedFiles) {
         this.id = id;
         this.userId = userId;
         this.userPoint = userPoint;

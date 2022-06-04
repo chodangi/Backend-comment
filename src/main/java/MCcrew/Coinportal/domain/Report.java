@@ -32,7 +32,7 @@ public class Report {
 
     @PrePersist
     public void createdAt() {
-        this.createdAt = LocalDateTime.now().plusHours(9);
+        this.createdAt = LocalDateTime.now();
     }
 
     @Builder

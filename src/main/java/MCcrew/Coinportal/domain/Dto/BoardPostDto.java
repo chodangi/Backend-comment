@@ -26,7 +26,6 @@ public class BoardPostDto {
     private List<MultipartFile> attachmentFiles = new ArrayList<>();
 
     public Post createBoard() {
-        Date date = new Date();
         return Post.builder()
                 .userId(userId)
                 .comments(new ArrayList<>())
@@ -39,8 +38,6 @@ public class BoardPostDto {
                 .downCnt(0)
                 .viewCnt(0)
                 .reportCnt(0)
-                .createdAt(date)
-                .updatedAt(date)
                 .status('A')
                 .attachedFiles(new ArrayList<>())
                 .build();

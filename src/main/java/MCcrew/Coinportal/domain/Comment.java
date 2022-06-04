@@ -45,15 +45,15 @@ public class Comment { // 게시글 댓글
 
     @PrePersist
     public void createdAt() {
-        this.createdAt = LocalDateTime.now().plusHours(9);
-        this.updateAt = LocalDateTime.now().plusHours(9);
+        this.createdAt = LocalDateTime.now();
+        this.updateAt = LocalDateTime.now();
         this.reportCnt = 0;
         this.status = 'A';
     }
 
     @PreUpdate
     public void updatedAt() {
-        this.updateAt = LocalDateTime.now().plusHours(9);
+        this.updateAt = LocalDateTime.now();
     }
 
     @Builder

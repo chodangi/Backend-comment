@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.NoResultException;
 import java.io.File;
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -104,7 +105,6 @@ public class BoardService {
      */
     @Transactional
     public Post createPostByUser(PostDto userPostDto) {
-        Date date = new Date();
         Post newPost = new Post();
         newPost.setUserId(userPostDto.getUserId());
         newPost.setUserPoint(userPostDto.getUserPoint());
@@ -117,8 +117,6 @@ public class BoardService {
         newPost.setDownCnt(0);
         newPost.setViewCnt(0);
         newPost.setReportCnt(0);
-        newPost.setCreatedAt(date);
-        newPost.setUpdatedAt(date);
         newPost.setStatus('A');
         return boardRepository.save(newPost);
     }
@@ -133,10 +131,9 @@ public class BoardService {
             return new Post();
         }
         else{
-            Date date = new Date();
             findPost.setContent(postDto.getContent());
             findPost.setBoardName(postDto.getBoardName());
-            findPost.setUpdatedAt(date);
+            findPost.setUpdatedAt(LocalDateTime.now());
             return boardRepository.save(findPost);
         }
     }
@@ -366,8 +363,6 @@ public class BoardService {
         사진 업로드하기
      */
     public Post post(PostDto postDto, Long userIdx) throws IOException {
-        Date date = new Date();
-
         Post post = new Post();
         post.setUserId(userIdx);
         post.setUserPoint(postDto.getUserPoint());
@@ -381,8 +376,6 @@ public class BoardService {
         post.setDownCnt(0);
         post.setViewCnt(0);
         post.setReportCnt(0);
-        post.setCreatedAt(date);
-        post.setUpdatedAt(date);
         post.setStatus('A');
 
         Post savedPost = boardRepository.save(post);
@@ -396,8 +389,6 @@ public class BoardService {
      */
     public Post postByNonUser(PostDto postDto, Long userIdx) throws IOException {
         List<Attachment> attachments = attachmentService.saveAttachments(postDto.getAttachedFiles(), postDto.getPostId());
-        Date date = new Date();
-
         Post post = new Post();
         post.setUserId(userIdx);
         post.setComments(new ArrayList<>());
@@ -410,8 +401,6 @@ public class BoardService {
         post.setDownCnt(0);
         post.setViewCnt(0);
         post.setReportCnt(0);
-        post.setCreatedAt(date);
-        post.setUpdatedAt(date);
         post.setStatus('A');
         post.setAttachedFiles(attachments);
 
