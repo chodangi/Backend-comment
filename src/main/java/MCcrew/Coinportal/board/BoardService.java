@@ -144,9 +144,9 @@ public class BoardService {
     /**
         선택한 게시글 좋아요
      */
-    public int likePost(Long postId){
+    public int likePost(Long postId, int count){
         Post findPost = boardRepository.findById(postId);
-        findPost.setUpCnt(findPost.getUpCnt() + 1);
+        findPost.setUpCnt(findPost.getUpCnt() + count);
         boardRepository.save(findPost);
         return findPost.getUpCnt();
     }
