@@ -323,14 +323,12 @@ public class CoinTemperService {
      */
     public CoinComment updateCoinComment(CoinCommentDto coinCommentDto, Long userId) {
         Long commentId = coinCommentDto.getCommentId();
-        CoinComment coinComment = coinTemperRepository.findById(commentId);
-        if(coinComment.getUserId() != userId){
+        CoinComment findCoinComment = coinTemperRepository.findById(commentId);
+        if(findCoinComment.getUserId() != userId){
             return new CoinComment();
         }else{
-            coinComment.setCoinSymbol(coinCommentDto.getCoinSymbol());
-            coinComment.setNickname(coinCommentDto.getNickname());
-            coinComment.setContent(coinCommentDto.getContent());
-            return coinTemperRepository.save(coinComment);
+            findCoinComment.setContent(coinCommentDto.getContent());
+            return coinTemperRepository.save(findCoinComment);
         }
     }
 
@@ -339,8 +337,8 @@ public class CoinTemperService {
      */
     public boolean deleteCoinComment(CoinCommentDto coinCommentDto , Long userId) {
         Long commentId = coinCommentDto.getCommentId();
-        CoinComment coinComment = coinTemperRepository.findById(commentId);
-        if(coinComment.getUserId() == userId){
+        CoinComment findCoinComment = coinTemperRepository.findById(commentId);
+        if(findCoinComment.getUserId() == userId){
             int deletedColumn = coinTemperRepository.delete(commentId);
             if(deletedColumn > 0){
                 return true;
@@ -353,9 +351,6 @@ public class CoinTemperService {
         }
     }
 
-    /**
-        비회원 댓글 삭제
-     */
     public boolean status2Block(Long commentId) {
         CoinComment findCoinComment = coinTemperRepository.findById(commentId);
         findCoinComment.setStatus('D');
