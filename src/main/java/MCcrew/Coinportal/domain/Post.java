@@ -37,10 +37,6 @@ public class Post {            // 게시글
     private int downCnt;      // 싫어요 개수
     private int viewCnt;      // 조회수
     private int reportCnt;    // 신고수
-    /*@Temporal(TemporalType.TIMESTAMP)
-    private Date createdAt;    // 생성 날짜
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date updatedAt;    // 수정 날짜*/
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     // A:active, D:deleted, R:reported

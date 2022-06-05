@@ -22,7 +22,6 @@ public class CoinComment {
     private Long userId;
     private String coinSymbol;
     private String nickname;
-    private String password;
     private String content;
 
     // 05.08 추가
@@ -43,14 +42,13 @@ public class CoinComment {
     }
 
     @Builder
-    public CoinComment(Long id, Long userId, String coinSymbol, String nickname, String password, String content,
+    public CoinComment(Long id, Long userId, String coinSymbol, String nickname, String content,
                        int commentGroup, int level,
                        LocalDateTime createdAt, int upCnt, int downCnt, int reportCnt, char status) {
         this.id = id;
         this.userId = userId;
         this.coinSymbol = coinSymbol;
         this.nickname = nickname;
-        this.password = password;
         this.content = content;
         this.commentGroup = commentGroup;
         this.level = level;

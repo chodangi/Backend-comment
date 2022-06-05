@@ -93,7 +93,6 @@ public class CommentController {
         if(userId==1) commentService.status2Block(commentId);
         //HashMap<String,Object> result = commentService.reportComment(commentId);
         boolean result = commentService.reportComment2(commentId, userId, remoteAddr);
-        System.out.println("==========================================================");
         return ResponseEntity.ok(new CommonResponse(result));
     }
 }

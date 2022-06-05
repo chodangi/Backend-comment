@@ -39,6 +39,7 @@ public class CommentService {
         User findUser = userRepository.findById(userId);
         Comment newComment = Comment.builder()
                 .userId(findUser.getId())
+                .userPoint(commentDto.getUserPoint())
                 .post(findPost)
                 .nickname(commentDto.getNickname())
                 .password(commentDto.getPassword())
@@ -57,6 +58,7 @@ public class CommentService {
         User findUser = userRepository.findById(userId);
         Comment newComment = Comment.builder()
                 .userId(findUser.getId())
+                .userPoint(commentDto.getUserPoint())
                 .post(findPost)
                 .nickname(commentDto.getNickname())
                 .password(commentDto.getPassword())

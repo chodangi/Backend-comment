@@ -184,8 +184,8 @@ public class BoardController {
             // 관리자일 경우 바로 삭제
             if(userId==1) boardService.status2Block(postId);
 
-            int reportCnt = boardService.reportPost(postId);
-            return ResponseEntity.ok().body(new CommonResponse(reportCnt));
+            boolean result = boardService.reportPost2(postId, userId, remoteAddr);
+            return ResponseEntity.ok().body(new CommonResponse(result));
         }catch(Exception e){
             return ResponseEntity.internalServerError().build();
         }

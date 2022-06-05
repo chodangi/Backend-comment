@@ -21,6 +21,10 @@ public class Report {
     @JoinColumn(name = "comment_id")
     private Comment comment;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "coin_id")
+    private CoinComment coinComment;
+
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
@@ -36,10 +40,11 @@ public class Report {
     }
 
     @Builder
-    public Report(Long id, Post post, Comment comment, User user, String ip, LocalDateTime createdAt) {
+    public Report(Long id, Post post, Comment comment, CoinComment coinComment, User user, String ip, LocalDateTime createdAt) {
         this.id = id;
         this.post = post;
         this.comment = comment;
+        this.coinComment = coinComment;
         this.user = user;
         this.ip = ip;
         this.createdAt = createdAt;

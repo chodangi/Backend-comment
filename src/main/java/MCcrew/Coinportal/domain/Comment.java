@@ -25,6 +25,7 @@ public class Comment { // 게시글 댓글
 
     @Column(name = "user_id_ref")
     private Long userId;
+    private int userPoint;
 
     @Column(length = 15)
     private String nickname;
@@ -57,10 +58,11 @@ public class Comment { // 게시글 댓글
     }
 
     @Builder
-    public Comment(Long id, Post post, Long userId, String nickname, String password, String content, int commentGroup, int level, int reportCnt, LocalDateTime createdAt, LocalDateTime updateAt, char status) {
+    public Comment(Long id, Post post, Long userId, int userPoint, String nickname, String password, String content, int commentGroup, int level, int reportCnt, LocalDateTime createdAt, LocalDateTime updateAt, char status) {
         this.id = id;
         this.post = post;
         this.userId = userId;
+        this.userPoint = userPoint;
         this.nickname = nickname;
         this.password = password;
         this.content = content;
