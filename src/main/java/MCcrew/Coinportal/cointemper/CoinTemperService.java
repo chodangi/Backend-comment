@@ -2,7 +2,10 @@ package MCcrew.Coinportal.cointemper;
 
 import MCcrew.Coinportal.domain.Dto.CoinCommentDto;
 import MCcrew.Coinportal.domain.CoinComment;
-import MCcrew.Coinportal.domain.Dto.PostCoinCommentDto;
+import MCcrew.Coinportal.domain.Dto.CoinTemperDto;
+import MCcrew.Coinportal.domain.Report;
+import MCcrew.Coinportal.domain.User;
+import MCcrew.Coinportal.user.UserRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -38,9 +41,11 @@ public class CoinTemperService {
     private BigDecimal diff = new BigDecimal("0.1");
 
     private final CoinTemperRepository coinTemperRepository;
+    private final UserRepository userRepository;
 
-    public CoinTemperService(CoinTemperRepository coinTemperRepository) {
+    public CoinTemperService(CoinTemperRepository coinTemperRepository, UserRepository userRepository) {
         this.coinTemperRepository = coinTemperRepository;
+        this.userRepository = userRepository;
     }
 
     /**
@@ -234,12 +239,12 @@ public class CoinTemperService {
     /**
         댓글달기
     */
-    public CoinComment createComment(PostCoinCommentDto dto, String symbol, Long userIdx) {
+    public CoinComment createComment(CoinTemperDto dto, String symbol, Long userIdx) {
         CoinComment coinComment = new CoinComment();
+        User findUser = userRepository.findById(userIdx);
         coinComment.setUserId(userIdx);
         coinComment.setCoinSymbol(symbol);
-        coinComment.setNickname(dto.getNickname());
-        coinComment.setPassword(dto.getPassword());
+        coinComment.setNickname(findUser.getUserNickname());
         coinComment.setContent(dto.getContent());
         coinComment.setCommentGroup(coinTemperRepository.getLastGroup().get(0)+1);
         coinComment.setLevel(dto.getLevel());
@@ -251,12 +256,12 @@ public class CoinTemperService {
     /**
      대댓글달기
      */
-    public CoinComment createReplyComment(PostCoinCommentDto dto, String symbol, Long userIdx) {
+    public CoinComment createReplyComment(CoinTemperDto dto, String symbol, Long userIdx) {
         CoinComment coinComment = new CoinComment();
+        User findUser = userRepository.findById(userIdx);
         coinComment.setUserId(userIdx);
         coinComment.setCoinSymbol(symbol);
-        coinComment.setNickname(dto.getNickname());
-        coinComment.setPassword(dto.getPassword());
+        coinComment.setNickname(findUser.getUserNickname());
         coinComment.setContent(dto.getContent());
         coinComment.setCommentGroup(dto.getCommentGroup());
         coinComment.setLevel(dto.getLevel());
@@ -276,10 +281,23 @@ public class CoinTemperService {
     /**
         댓글 신고
      */
-    public int reportCoinComment(Long id){
-        CoinComment coinComment =  coinTemperRepository.findById(id);
-        coinComment.setReportCnt(coinComment.getReportCnt() + 1);
-        return coinTemperRepository.save(coinComment).getReportCnt();
+    public boolean reportCoinComment(Long coinId, Long userId){
+        CoinComment findCoinComment =  coinTemperRepository.findById(coinId);
+        User findUser = userRepository.findById(userId);
+        // 이력이 있다면 신고 불가
+        if(coinTemperRepository.findReportById(findCoinComment, findUser) > 0) return false;
+        // 이력이 없다면 report 테이블에 레코드 추가
+        Report report = Report.builder()
+                .coinComment(findCoinComment)
+                .user(findUser)
+                .build();
+        coinTemperRepository.save(report);
+
+        // 신고 3회 누적시 삭제
+        if(findCoinComment.getReportCnt() >= 2) findCoinComment.setStatus('D');
+        else findCoinComment.setReportCnt(findCoinComment.getReportCnt()+1);
+        coinTemperRepository.save(findCoinComment);
+        return true;
     }
 
     /**
@@ -311,25 +329,8 @@ public class CoinTemperService {
         }else{
             coinComment.setCoinSymbol(coinCommentDto.getCoinSymbol());
             coinComment.setNickname(coinCommentDto.getNickname());
-            coinComment.setPassword(coinCommentDto.getPassword());
             coinComment.setContent(coinCommentDto.getContent());
             return coinTemperRepository.save(coinComment);
-        }
-    }
-
-    /**
-        비회원 댓글 수정
-     */
-    public CoinComment updateCoinCommentByNonUser(CoinCommentDto coinCommentDto) {
-        Long commentId = coinCommentDto.getCommentId();
-        CoinComment coinComment = coinTemperRepository.findById(commentId);
-        if(coinComment.getPassword() == coinCommentDto.getPassword()){ // 댓글 비밀번호가 맞다면
-            coinComment.setNickname(coinCommentDto.getNickname());
-            coinComment.setPassword(coinCommentDto.getPassword());
-            coinComment.setContent(coinCommentDto.getContent());
-            return coinTemperRepository.save(coinComment);
-        }else{ // 댓글 비밀번호가 틀리다면
-            return new CoinComment();
         }
     }
 
@@ -355,19 +356,10 @@ public class CoinTemperService {
     /**
         비회원 댓글 삭제
      */
-    public boolean deleteCoinCommentByNonUser(CoinCommentDto coinCommentDto) {
-        Long commentId = coinCommentDto.getCommentId();
-        CoinComment coinComment = coinTemperRepository.findById(commentId);
-        if(coinComment.getPassword() == coinCommentDto.getPassword()){ // 댓글 비밀번호가 맞다면
-            int deletedColumn = coinTemperRepository.delete(commentId);
-            if(deletedColumn > 0){
-                return true;
-            }
-            else{
-                return false;
-            }
-        }else{
-            return false;
-        }
+    public boolean status2Block(Long commentId) {
+        CoinComment findCoinComment = coinTemperRepository.findById(commentId);
+        findCoinComment.setStatus('D');
+        coinTemperRepository.save(findCoinComment);
+        return true;
     }
 }

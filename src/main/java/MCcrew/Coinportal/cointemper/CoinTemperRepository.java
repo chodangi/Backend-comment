@@ -1,6 +1,8 @@
 package MCcrew.Coinportal.cointemper;
 
 import MCcrew.Coinportal.domain.CoinComment;
+import MCcrew.Coinportal.domain.Report;
+import MCcrew.Coinportal.domain.User;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -64,4 +66,19 @@ public class CoinTemperRepository {
         Query query = em.createQuery(sql);
         return query.setMaxResults(1).getResultList();
     }
+
+    public Long findReportById(CoinComment coinComment, User user) {
+        String sql = "select count(r) from Report r where r.coinComment=:coinComment and r.user=:user";
+        return (Long) em.createQuery(sql)
+                .setParameter("coinComment", coinComment)
+                .setParameter("user", user)
+                .getSingleResult();
+    }
+
+    public Report save(Report report) {
+        em.persist(report);
+        return report;
+    }
+
+
 }

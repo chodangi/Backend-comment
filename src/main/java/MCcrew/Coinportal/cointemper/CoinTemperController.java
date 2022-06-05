@@ -2,7 +2,7 @@ package MCcrew.Coinportal.cointemper;
 
 import MCcrew.Coinportal.domain.Dto.CoinCommentDto;
 import MCcrew.Coinportal.domain.CoinComment;
-import MCcrew.Coinportal.domain.Dto.PostCoinCommentDto;
+import MCcrew.Coinportal.domain.Dto.CoinTemperDto;
 import MCcrew.Coinportal.login.JwtService;
 import MCcrew.Coinportal.util.*;
 import io.swagger.annotations.ApiOperation;
@@ -102,7 +102,7 @@ public class CoinTemperController {
     @ApiOperation(value = "코인 종류별 체감온도 댓글 post",
             notes = "BTC(비트코인) ETH(이더리움) XRP(리플) ADA(에이다) SOL(솔라나) DOG(도지코인) DOT(폴카닷) TRX(트론) DAI(다이) AVX(아발란체) WMX(위믹스) REP(어거) ETC(이더리움 클래식) BTG(비트코인 골드)")
     @PostMapping("/comment/{symbol}")
-    public ResponseEntity<? extends BasicResponse> commentController(@PathVariable String symbol, @RequestBody PostCoinCommentDto commentDto, @RequestHeader String jwt){
+    public ResponseEntity<? extends BasicResponse> commentController(@PathVariable String symbol, @RequestBody CoinTemperDto coinCommentDto, @RequestHeader String jwt){
         logger.info("createCommentController(): " + symbol + "에 댓글을 작성합니다.");
         Long userIdx = jwtService.getUserIdByJwt(jwt);
 
@@ -110,10 +110,10 @@ public class CoinTemperController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse("허가되지 않은 사용자입니다."));
         }else{
             CoinComment result;
-            if (commentDto.getCommentGroup() == -1) {
-                result = coinTemperService.createComment(commentDto, symbol, userIdx);
+            if (coinCommentDto.getCommentGroup() == -1) {
+                result = coinTemperService.createComment(coinCommentDto, symbol, userIdx);
             } else {
-                result = coinTemperService.createReplyComment(commentDto, symbol, userIdx);
+                result = coinTemperService.createReplyComment(coinCommentDto, symbol, userIdx);
             }
             return ResponseEntity.ok().body(new CommonResponse(result));
         }
@@ -281,24 +281,15 @@ public class CoinTemperController {
     public ResponseEntity<? extends BasicResponse> updateCommentController(@RequestBody CoinCommentDto coinCommentDto, @RequestHeader String jwt){
         logger.info("updateCommentController(): 댓글을 수정합니다.");
         CoinComment coinComment;
-        if(jwt != null){
-            Long userId = jwtService.getUserIdByJwt(jwt);
-            if(userId == 0L) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse("허가되지 않은 사용자입니다."));
-            }
-            else{
-                coinComment = coinTemperService.updateCoinComment(coinCommentDto, userId);
-                if(coinComment.getId() == null){
-                    return ResponseEntity.notFound().build();
-                }else {
-                    return ResponseEntity.ok().body(new CommonResponse(coinComment));
-                }
-            }
-        }else{
-            coinComment = coinTemperService.updateCoinCommentByNonUser(coinCommentDto);
+        Long userId = jwtService.getUserIdByJwt(jwt);
+        if(userId == 0L) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse("허가되지 않은 사용자입니다."));
+        }
+        else{
+            coinComment = coinTemperService.updateCoinComment(coinCommentDto, userId);
             if(coinComment.getId() == null){
                 return ResponseEntity.notFound().build();
-            }else{
+            }else {
                 return ResponseEntity.ok().body(new CommonResponse(coinComment));
             }
         }
@@ -311,19 +302,11 @@ public class CoinTemperController {
     @DeleteMapping("/comment")
     public ResponseEntity<? extends BasicResponse> deleteCommentController(@RequestBody CoinCommentDto coinCommentDto, @RequestHeader String jwt ){
         logger.info("deleteCommentController(): 댓글을 삭제합니다.");
-        if(jwt != null){ //회원의 글이라면
-            Long userId = jwtService.getUserIdByJwt(jwt);
-            if(userId == 0L)
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse("허가되지 않은 사용자입니다."));
-            else {
-                boolean result = coinTemperService.deleteCoinComment(coinCommentDto, userId);
-                if(result){
-                    return ResponseEntity.ok().body(new CommonResponse(result));
-                }
-                return ResponseEntity.notFound().build();
-            }
-        }else{ //비회원의 글이라면
-            boolean result = coinTemperService.deleteCoinCommentByNonUser(coinCommentDto);
+        Long userId = jwtService.getUserIdByJwt(jwt);
+        if(userId == 0L)
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse("허가되지 않은 사용자입니다."));
+        else {
+            boolean result = coinTemperService.deleteCoinComment(coinCommentDto, userId);
             if(result){
                 return ResponseEntity.ok().body(new CommonResponse(result));
             }
@@ -336,9 +319,15 @@ public class CoinTemperController {
     */
     @ApiOperation(value = "체감온도 댓글 신고")
     @PostMapping("/comment-report")
-    public ResponseEntity<? extends BasicResponse> reportCommentController(@RequestParam Long commentId){
+    public ResponseEntity<? extends BasicResponse> reportCommentController(@RequestParam Long commentId, @RequestHeader String jwt){
         logger.info("reportCommentController(): " + commentId+ "번 댓글을 신고합니다.");
-        int report = coinTemperService.reportCoinComment(commentId);
+        Long userId = jwtService.getUserIdByJwt(jwt);
+        if(userId == 0L) return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse("허가되지 않은 사용자입니다."));
+
+        // 관리자일 경우 바로 삭제
+        if(userId==1) coinTemperService.status2Block(commentId);
+
+        boolean report = coinTemperService.reportCoinComment(commentId, userId);
         return ResponseEntity.ok().body(new CommonResponse(report));
     }
 
