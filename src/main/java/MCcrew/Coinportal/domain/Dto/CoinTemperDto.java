@@ -4,12 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Getter @Setter
-public class PostCommentDto {
-    private Long postId;
-    private Long userId;
-    private int userPoint;
-    private String nickname;
-    private String password;
+public class CoinTemperDto {
     private String content;
     private int commentGroup;
     private int level;
