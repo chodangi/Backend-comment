@@ -325,7 +325,7 @@ public class CoinTemperController {
         if(userId == 0L) return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse("허가되지 않은 사용자입니다."));
 
         // 관리자일 경우 바로 삭제
-        if(userId==1) coinTemperService.status2Block(commentId);
+        if(userId==1 || userId==14 || userId==15 || userId==16 || userId==17) coinTemperService.status2Block(commentId);
 
         boolean report = coinTemperService.reportCoinComment(commentId, userId);
         return ResponseEntity.ok().body(new CommonResponse(report));

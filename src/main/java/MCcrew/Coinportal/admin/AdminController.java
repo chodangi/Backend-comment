@@ -65,7 +65,7 @@ public class AdminController {
     }
 
     /**
-        모든 공지글 가져오기
+     모든 공지글 가져오기
      */
     @GetMapping("/notices")
     public ResponseEntity<? extends BasicResponse> getNoticeController(){
@@ -78,7 +78,7 @@ public class AdminController {
     }
 
     /**
-        공지글 작성
+     공지글 작성
      */
     @PostMapping("/notice")
     public ResponseEntity<? extends BasicResponse> createNoticeController(@RequestBody NoticeDto noticeDto){
@@ -88,7 +88,7 @@ public class AdminController {
     }
 
     /**
-        공지글 수정
+     공지글 수정
      */
     @PutMapping("/notice/{noticeId}")
     public ResponseEntity<? extends BasicResponse> updateNoticeController(@RequestBody NoticeDto noticeDto, @PathVariable Long noticeId){
@@ -98,7 +98,7 @@ public class AdminController {
     }
 
     /**
-        공지글 삭제
+     공지글 삭제
      */
     @DeleteMapping("/notice/{noticeId}")
     public ResponseEntity<? extends BasicResponse> deleteNoticeController(@PathVariable Long noticeId){
@@ -107,7 +107,7 @@ public class AdminController {
     }
 
     /**
-       메모리 사용량 체크
+     메모리 사용량 체크
      */
     @GetMapping("/memory")
     public ResponseEntity<? extends BasicResponse> checkMemoryController(){
@@ -123,6 +123,7 @@ public class AdminController {
         int deleted = boardRepository.deleteGuestPwdNullUser();
         return ResponseEntity.ok().body(new CommonResponse<>(deleted));
     }
+
 
     @GetMapping("/game-start")
     public boolean gameStartController(){

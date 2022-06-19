@@ -78,7 +78,9 @@ public class BoardService {
     */
     @Transactional
     public List<Post> searchPostsByPopularity() {
+        System.out.println("=================test111111111111===================");
         List<Post> postList = boardRepository2.findAll(Sort.by(Sort.Direction.DESC, "upCnt"));
+        System.out.println("=============test2222222222222==================");
         if(postList.isEmpty())
             return new ArrayList<>();
         return postList;

@@ -70,10 +70,14 @@ public class BoardController {
     @GetMapping("/up-count")
     public ResponseEntity<? extends BasicResponse> searchByPopularityController(){
         logger.info("searchByPopularityController(): 실시간 인기글 리스트 검색");
+        System.out.println("-------------------test1----------------------");
         List<Post> postList = boardService.searchPostsByPopularity();
+        System.out.println("----------------------test2-------------------");
         if(postList.size() == 0){
+            System.out.println("------------------test3-------------------");
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse("존재하는 인기 게시글이 없습니다."));
         }
+        System.out.println("------------------test4------------------------");
         return ResponseEntity.ok().body(new CommonResponse(postList));
     }
 
@@ -156,7 +160,7 @@ public class BoardController {
             }
             Long userId = jwtService.getUserIdByJwt(jwt);
             // 관리자일 경우 바로 삭제
-            if(userId==1) boardService.status2Block(postId);
+            if(userId==1 || userId==14 || userId==15 || userId==16 || userId==17) boardService.status2Block(postId);
 
             boolean result = boardService.reportPost2(postId, userId, remoteAddr);
             return ResponseEntity.ok().body(new CommonResponse(result));

@@ -6,6 +6,7 @@ import MCcrew.Coinportal.domain.BetHistory;
 import MCcrew.Coinportal.login.JwtService;
 import MCcrew.Coinportal.util.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,7 +58,22 @@ public class GameController {
         BTC_KRW
         ETH_KRW
         XRP_KRW
+        ADA_KRW(에이다)
+        DOGE_KRW(도지)
+        SOL_KRW(솔라나)
+        TRX_KRW(트론)
+        ETC_KRW(이더리움 클래식)
+        DOT_KRW(폴카닷)
+        AVAX_KRW(아발란체)
+        DAI_KRW(다이)
+        WEMIX_KRW(위믹스)
+        REP_KRW(어거)
+        BTG_KRW(비트코인 골드)
      */
+    //
+    @ApiOperation(value = "코인 심볼별 차트 get",
+            notes = "BTC_KRW(비트코인) ETH_KRW(이더리움) XRP_KRW(리플) ADA_KRW(에이다) DOGE_KRW(도지) SOL_KRW(솔라나) " +
+                    "TRX_KRW(트론) ETC_KRW(이더리움 클래식) DOT_KRW(폴카닷) AVAX_KRW(아발란체) DAI_KRW(다이) WEMIX_KRW(위믹스) REP_KRW(어거) BTG_KRW(비트코인 골드)")
     @GetMapping("/coin-chart/{symbol}")
     public ResponseEntity<? extends BasicResponse> coinChart(@PathVariable String symbol){
         logger.info("coinChart(): "+ symbol + "코인의 차트 정보 가져오기");
@@ -76,16 +92,21 @@ public class GameController {
     @PostMapping("/game-play")
     public ResponseEntity<? extends BasicResponse> predictCoinController(@RequestBody BetHistoryDto betHistoryDto, @RequestHeader String jwt){
         logger.info("predictCoinController(): 코인 궁예시작하기 - 게임 스타트 ");
-        if(jwt == null){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse("허가되지 않은 사용자입니다."));
+        try {
+            if(jwt == null){
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse("허가되지 않은 사용자입니다."));
+            }
+            Long userId = jwtService.getUserIdByJwt(jwt);
+            if(userId == 0L){
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse("허가되지 않은 사용자입니다."));
+            }else{
+                BetHistory betHistory = gameService.predict(betHistoryDto, userId);
+                return ResponseEntity.ok().body(new CommonResponse(betHistory));
+            }
+        } catch (IllegalStateException ie) {
+            return ResponseEntity.status(HttpStatus.ALREADY_REPORTED).body(new ErrorResponse("이미 플레이한 유저입니다. 1시간 후에 다시 참여해주세요."));
         }
-        Long userId = jwtService.getUserIdByJwt(jwt);
-        if(userId == 0L){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse("허가되지 않은 사용자입니다."));
-        }else{
-            BetHistory betHistory = gameService.predict(betHistoryDto, userId);
-            return ResponseEntity.ok().body(new CommonResponse(betHistory));
-        }
+
     }
 
     /**

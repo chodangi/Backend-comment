@@ -51,6 +51,22 @@ public class CommentService {
     }
 
     /**
+     비회원 댓글 생성
+     */
+    public Comment createNonUserComment(PostCommentDto commentDto) {
+        Post findPost = boardRepository.findById(commentDto.getPostId());
+        Comment newComment = Comment.builder()
+                .post(findPost)
+                .nickname(commentDto.getNickname())
+                .password(commentDto.getPassword())
+                .content(commentDto.getContent())
+                .commentGroup(commentRepository.getLastGroup().get(0)+1)
+                .level(commentDto.getLevel())
+                .build();
+        return commentRepository.save(newComment);
+    }
+
+    /**
      대댓글 생성
      */
     public Comment createReplyComment(PostCommentDto commentDto, Long userId) {
@@ -59,6 +75,23 @@ public class CommentService {
         Comment newComment = Comment.builder()
                 .userId(findUser.getId())
                 .userPoint(commentDto.getUserPoint())
+                .post(findPost)
+                .nickname(commentDto.getNickname())
+                .password(commentDto.getPassword())
+                .content(commentDto.getContent())
+                .commentGroup(commentDto.getCommentGroup())
+                .level(commentDto.getLevel())
+                .build();
+        findPost.getComments().add(newComment);
+        return commentRepository.save(newComment);
+    }
+
+    /**
+     비회원 대댓글 생성
+     */
+    public Comment createNonUserReplyComment(PostCommentDto commentDto) {
+        Post findPost = boardRepository.findById(commentDto.getPostId());
+        Comment newComment = Comment.builder()
                 .post(findPost)
                 .nickname(commentDto.getNickname())
                 .password(commentDto.getPassword())
@@ -93,6 +126,19 @@ public class CommentService {
     }
 
     /**
+     비회원 댓글 수정
+     */
+    public Comment updateNonUserComment(CommentDto commentDto){
+        Comment findComment = commentRepository.findById(commentDto.getCommentId());
+        if(commentDto.getPassword().equals(findComment.getPassword())){
+            findComment.setContent(commentDto.getContent());
+            return commentRepository.save(findComment);
+        }else{
+            return new Comment();
+        }
+    }
+
+    /**
         삭제 상태로 변경
      */
     public boolean status2Delete(Long commentId, String jwt){
@@ -112,6 +158,20 @@ public class CommentService {
                     return false;
                 }
             }
+        }
+    }
+
+    /**
+     비회원 삭제 상태로 변경
+     */
+    public boolean nonUserStatus2Delete(Long commentId){
+        Comment comment = commentRepository.findById(commentId);
+        try {
+            comment.setStatus('D');
+            commentRepository.save(comment);
+            return true;
+        }catch(Exception e){
+            return false;
         }
     }
 

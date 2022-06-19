@@ -48,24 +48,28 @@ public class GameService {
     }
 
     /**
-       승률 계산: (승리/전체플레이)*100 = 승률%
-    */
+     승률 계산: (승리/전체플레이)*100 = 승률%
+     */
     public static double calWinRate(int previousWins, int totalPlay, int wins){
         return (double) (((previousWins + wins) / (totalPlay)) * 100);
     }
     /**
-        코인 게임 코어 로직
-    */
+     코인 게임 코어 로직
+     */
+    //BTC(비트코인) ETH(이더리움) XRP(리플) ADA(에이다) SOL(솔라나) DOG(도지코인) DOT(폴카닷) TRX(트론) DAI(다이) AVX(아발란체) WMX(위믹스) REP(어거) ETC(이더리움 클래식) BTG(비트코인 골드)
+    private static Timer m;
+    private static TimerTask task;
     public static boolean gameTimer() {
         System.out.println("creating timer...");
-        Timer m = new Timer();
+        m = new Timer();
 
-        TimerTask task = new TimerTask() {
+        task = new TimerTask() {
             @Override
             public void run() {
                 double priceBTC = 0.0;
                 double priceETH = 0.0;
                 double priceXRP = 0.0;
+
                 try {
                     priceBTC = Double.valueOf(getPriceFromBithumb("BTC/KRW"));
                     priceETH = Double.valueOf(getPriceFromBithumb("ETH/KRW"));
@@ -79,7 +83,7 @@ public class GameService {
                 /*
                     훈수 승률 계산
                  */
-                int wins = 0;
+                int wins = 1;
                 if (botBtcPriceTemp >= priceBTC) {
                     if(botBTC == true){
                         ++wins;
@@ -120,17 +124,17 @@ public class GameService {
                 boolean resultExist = true;
 
                 try {
-                     findBetHistory = gameRepository.findAll();
+                    findBetHistory = gameRepository.findAll();
                 }catch(NoResultException e) {
                     resultExist = false;
                 }
                 findBetHistory = findBetHistory.stream().filter(b -> b.isEvaluated() == false).collect(Collectors.toList());
 
-                wins = 0;
+                // wins = 0;
                 for(BetHistory betHistory: findBetHistory){
                     if(resultExist == false)
                         break;
-                    User findUser = userRepository.findById(betHistory.getId());
+                    User findUser = userRepository.findById(betHistory.getUserId());
 
                     if (betHistory.getBtcPriceNow() >= priceBTC) {
                         if(betHistory.isBTC() == true){
@@ -160,11 +164,13 @@ public class GameService {
                             ++wins;
                         }
                     }
+                    System.out.println("gggggggggggggggggggggggggggggggggggggg");
                     findUser.setPoint(findUser.getPoint() + ((int) (100*wins)));
                     findUser.setWinsRate(calWinRate(findUser.getPreviousWins(), findUser.getTotalPlay(), wins));
                     findUser.setPreviousWins(findUser.getPreviousWins() + wins);
                     findUser.setTotalPlay(findUser.getTotalPlay() + 1);
                     userRepository.save(findUser);
+                    System.out.println("GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG");
                 }
 
                 botBTC = randomGen.nextBoolean();
@@ -191,8 +197,8 @@ public class GameService {
     }
 
     /**
-       빗썸에서 코인 현재가격 가져오기
-    */
+     빗썸에서 코인 현재가격 가져오기
+     */
     public static String getPriceFromBithumb(String coinSymbol){
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
@@ -221,8 +227,8 @@ public class GameService {
     }
 
     /**
-        <반환값 포맷>
-        기준시간 - 시가 - 종가 - 고가 - 저가 - 거래량
+     <반환값 포맷>
+     기준시간 - 시가 - 종가 - 고가 - 저가 - 거래량
      */
     public String getChartFromBithumb(String coinSymbol) throws Exception{
         String intervals = "1h";  // 한시간으로 설정
@@ -244,11 +250,11 @@ public class GameService {
     }
 
     /**
-        코인 궁예하기
+     코인 궁예하기
      */
-    public BetHistory predict(BetHistoryDto betHistoryDto, Long userId) {
+    public BetHistory predict(BetHistoryDto betHistoryDto, Long userId) throws IllegalStateException {
         if(playerList.contains(userId)) // 이미 플레이한 유저라면 이용 불가능
-            return new BetHistory();
+            throw new IllegalStateException();
 
         playerList.add(userId);
 
@@ -276,7 +282,7 @@ public class GameService {
     }
 
     /**
-        코인 훈수 따라가기
+     코인 훈수 따라가기
      */
     public BetHistory predictRandom(Long userId) {
         if(playerList.contains(userId)) // 이미 플레이한 유저라면 이용 불가능
@@ -308,14 +314,14 @@ public class GameService {
     }
 
     /**
-        내 전적 보기
+     내 전적 보기
      */
     public List<BetHistory> getMyBetHistory(Long userId) {
         return gameRepository.findById(userId);
     }
 
     /**
-        현재 코인 훈수 보기
+     현재 코인 훈수 보기
      */
     public BetHistoryDto getRandomCoinPrediction() {
         BetHistoryDto betHistoryDto = new BetHistoryDto();
@@ -326,7 +332,7 @@ public class GameService {
     }
 
     /**
-        랭킹 가져오기 + 코인봇 점수 추가해서 리턴
+     랭킹 가져오기 + 코인봇 점수 추가해서 리턴
      */
     public List<UserRankingDto> getGamePointRanking() {
         List<UserRankingDto> userRankingDtoList = userService.getUserRanking();

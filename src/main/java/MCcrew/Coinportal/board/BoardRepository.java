@@ -62,6 +62,7 @@ public class BoardRepository{
     /**
         인기순으로 게시글 조회
      */
+    @Transactional
     public List<Post> findByPopularity() {
         String sql = "select p from Post p order by p.upCnt DESC";
         return em.createQuery(sql, Post.class).getResultList();

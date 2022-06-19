@@ -44,7 +44,7 @@ public class JwtService {
                         .claim("userEmail", userEmail) // private Claim 넣기
                         .setIssuedAt(new Date(System.currentTimeMillis())) // token 생성날짜
                         .setExpiration(
-                                new Date(System.currentTimeMillis() + 60*60*1000)) // token 유효시간
+                                new Date(System.currentTimeMillis() + 3*60*60*1000)) // token 유효시간
                         //signature
                         .signWith(SignatureAlgorithm.HS512, generationKey.getBytes("UTF-8"))
                         .compact();

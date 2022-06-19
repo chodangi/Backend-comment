@@ -13,11 +13,13 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.UriUtils;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 @Slf4j
 @Controller
@@ -56,6 +58,14 @@ public class AttachmentController {
             post = new Post();
         }
         return post;
+    }
+
+    @PostMapping("/test")
+    @ResponseBody
+    public String test(@ModelAttribute PostDto postDto){
+        logger.info("doPost(): 게시글 포스팅하기");
+        List<MultipartFile> fileList = postDto.getAttachedFiles();
+        return fileList.get(0).getClass().getSimpleName();
     }
 
     /**
