@@ -150,9 +150,9 @@ public class BoardService {
     /**
         선택한 게시글 싫어요
      */
-    public int dislikePost(Long postId){
+    public int dislikePost(Long postId, int count){
         Post findPost = boardRepository.findById(postId);
-        findPost.setDownCnt(findPost.getDownCnt() + 1);
+        findPost.setDownCnt(findPost.getDownCnt() + count);
         boardRepository.save(findPost);
         return findPost.getDownCnt();
     }

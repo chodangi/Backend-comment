@@ -86,7 +86,7 @@ public class PreferenceController {
     public ResponseEntity<? extends BasicResponse> myLikeController(@RequestHeader String jwt){
         logger.info("myLikeController(): 내가 누른 좋아요 모두 보기");
         if(jwt == null){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse("허가되지 않은 사용자입니다."));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse("JWT를 확인해주세요."));
         }
         Long userId = jwtService.getUserIdByJwt(jwt);
         if(userId == 0L){

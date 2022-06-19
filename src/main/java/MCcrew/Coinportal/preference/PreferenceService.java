@@ -47,6 +47,7 @@ public class PreferenceService {
             // 이력이 없을 경우 -> 좋아요 신규 등록
             preference = new Preference();
             preference.setLikes(true);
+            boardService.likePost(postId, 1);
         }
         preference.setPostId(postId);
         preference.setUserId(userId);
@@ -68,15 +69,19 @@ public class PreferenceService {
             // 이력이 있을 경우 & 싫어요 누른 상태일 경우 -> 싫어요 취소
             else if(preference.isDislikes()) {
                 preference.setDislikes(false);
+                boardService.dislikePost(postId, -1);
             }
             // 이력이 있을 경우 & 좋아요 싫어요 모두 취소상태일 경우 -> 싫어요 실행
             else {
                 preference.setDislikes(true);
+                boardService.dislikePost(postId, 1);
             }
         } catch (NoResultException e) {
             e.printStackTrace();
+            // 이력이 없을 경우 -> 좋아요 신규 등록
             preference = new Preference();
             preference.setDislikes(true);
+            boardService.dislikePost(postId, 1);
         }
         preference.setPostId(postId);
         preference.setUserId(userId);

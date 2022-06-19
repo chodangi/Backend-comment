@@ -31,8 +31,8 @@ public class JwtService {
     }
 
     /**
-       jwt 토큰 생성 및 반환
-    */
+     jwt 토큰 생성 및 반환
+     */
     public String generateJwt(String name, String userEmail) throws UnsupportedEncodingException {
         String jwt =
                 Jwts.builder()
@@ -52,7 +52,7 @@ public class JwtService {
     }
 
     /**
-        jwt 유효성 검사
+     jwt 유효성 검사
      */
     public boolean validateJwt(String jwt){
         try{
@@ -65,7 +65,7 @@ public class JwtService {
     }
 
     /**
-        jwt 에서 유저 이름 추출
+     jwt 에서 유저 이름 추출
      */
     public String getUserName(String jwt) throws UnsupportedEncodingException {
         Jws<Claims> claims = Jwts.parser().setSigningKey(generationKey.getBytes("UTF-8")).parseClaimsJws(jwt);
@@ -73,7 +73,7 @@ public class JwtService {
     }
 
     /**
-        jwt 에서 유저 이메일 추출
+     jwt 에서 유저 이메일 추출
      */
     public String getUserEmail(String jwt) throws UnsupportedEncodingException {
         Jws<Claims> claims = Jwts.parser().setSigningKey(generationKey.getBytes("UTF-8")).parseClaimsJws(jwt);
@@ -81,7 +81,7 @@ public class JwtService {
     }
 
     /**
-       기호를 기준으로 이메일에서 닉네임을 뽑아냄.
+     기호를 기준으로 이메일에서 닉네임을 뽑아냄.
      */
     public String getNicknameFromEmail(String email){
         int position = email.indexOf('@');
@@ -90,7 +90,7 @@ public class JwtService {
     }
 
     /**
-        jwt 를 통해 사용자 user 반환
+     jwt 를 통해 사용자 user 반환
      */
     public Long getUserIdByJwt(String jwt){
         boolean valid = validateJwt(jwt);

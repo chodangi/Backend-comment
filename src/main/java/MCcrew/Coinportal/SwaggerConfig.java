@@ -28,7 +28,7 @@ public class SwaggerConfig {
 
     private ApiInfo apiInfo() {
         return new ApiInfoBuilder()
-                .title("My RestfulAPI")
+                .title("CoinPortal API")
                 .version("1.0.0")
                 .description("나의 API 명세서")
                 .build();

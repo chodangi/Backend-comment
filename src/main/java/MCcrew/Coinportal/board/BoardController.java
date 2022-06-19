@@ -95,32 +95,6 @@ public class BoardController {
     }
 
     /**
-        단일 게시글 조회
-
-    @GetMapping("/post/{post-id}")
-    public ResponseEntity<? extends BasicResponse> getContentController(@PathVariable("post-id") Long postId, @RequestHeader String jwt){
-        logger.info("getContentController(): "+ postId + "번 게시글 조회");
-        Long userId = 0L;
-        HashMap hashMap = new HashMap();
-        if(jwt == null){
-            boardService.viewPost(postId); // 조회수 1 증가
-            hashMap.put(boardService.getSinglePost(postId), new Preference());
-            return ResponseEntity.ok().body(new CommonResponse(hashMap));
-        }else{
-            userId = jwtService.getUserIdByJwt(jwt);
-            if(userId == 0L){
-                boardService.viewPost(postId); // 조회수 1 증가
-                hashMap.put(boardService.getSinglePost(postId), new Preference());
-                return ResponseEntity.ok().body(new CommonResponse(hashMap));
-            }else{
-                boardService.viewPost(postId); // 조회수 1 증가
-                hashMap.put(boardService.getSinglePost(postId), preferenceService.getMyLike(postId, userId));
-                return ResponseEntity.ok().body(new CommonResponse(hashMap));
-            }
-        }
-    } */
-
-    /**
      *  단일 게시글 조회
      */
     @GetMapping("/post/{post-id}")
