@@ -58,7 +58,7 @@ public class BoardService {
     */
     @Transactional
     public List<Post> searchPostsByKeyword(String keyword) {
-        List<Post> postList = boardRepository2.findByContentContaining(keyword); // spring Data 사용
+        List<Post> postList = boardRepository.findByContent(keyword); // spring Data 사용
         if(postList.isEmpty())
             return new ArrayList<>();
         return postList;
@@ -69,7 +69,7 @@ public class BoardService {
      */
     @Transactional
     public List<Post> searchPostsByNickname(String nickname) {
-        List<Post> postList = boardRepository2.findByUserNicknameContaining(nickname); // spring Data 사용
+        List<Post> postList = boardRepository.findByNickname(nickname); // spring Data 사용
         if(postList.isEmpty()) return new ArrayList<>();
         return postList;
     }
@@ -79,7 +79,7 @@ public class BoardService {
     @Transactional
     public List<Post> searchPostsByPopularity() {
         System.out.println("=================test111111111111===================");
-        List<Post> postList = boardRepository2.findAll(Sort.by(Sort.Direction.DESC, "upCnt"));
+        List<Post> postList = boardRepository.findByPopularity();
         System.out.println("=============test2222222222222==================");
         if(postList.isEmpty())
             return new ArrayList<>();

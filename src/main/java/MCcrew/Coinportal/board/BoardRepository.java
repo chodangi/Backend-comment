@@ -64,24 +64,33 @@ public class BoardRepository{
      */
     @Transactional
     public List<Post> findByPopularity() {
-        String sql = "select p from Post p order by p.upCnt DESC";
+        String sql = "select distinct p from Post p left join fetch p.attachedFiles order by p.upCnt DESC";
         return em.createQuery(sql, Post.class).getResultList();
     }
 
     /**
         닉네임으로 게시물 조회
      */
-    public Post findByNickname(String userNickname){
-        String sql = "select p from Post p where p.userNickname = :userNickname";
+    public List<Post> findByNickname(String userNickname){
+        String sql = "select distinct p from Post p left join fetch p.attachedFiles where p.userNickname = :userNickname";
         return em.createQuery(sql, Post.class)
-                .setParameter("userNickname", userNickname).getResultList().get(0);
+                .setParameter("userNickname", userNickname).getResultList();
+    }
+
+    /**
+     *  키워드로 게시물 조회
+     */
+    public List<Post> findByContent(String keyword){
+        String sql = "select distinct p from Post p left join fetch p.attachedFiles where p.content like :keyword";
+        return em.createQuery(sql, Post.class)
+                .setParameter("keyword", "%"+keyword+"%").getResultList();
     }
 
     /**
         게시판별로 게시글 조회
      */
     public List<Post> findByBoardName(String boardName){
-        String sql = "select p from Post p where p.boardName = :boardName";
+        String sql = "select distinct p from Post p left join fetch p.attachedFiles where p.boardName = :boardName";
         return em.createQuery(sql, Post.class).setParameter("boardName", boardName).getResultList();
     }
 
